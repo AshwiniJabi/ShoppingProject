@@ -1,9 +1,9 @@
-Feature: Validating Product API
+Feature: Validating Create Product API
 Once the user has logged in successfully , user should be able to view all products,add product,delete product and view single product
 
 
-@CreateProduct
-Scenario Outline: With the usertoken user should be able to create a product using CreateProductAPI
+
+Scenario: With the usertoken user should be able to create a product using CreateProductAPI
 Given User has valid usertoken
 And User gives "formParams" "productName" as "Mango"
 And User gives "formParams" "productCategory" as "Fashion"
@@ -16,6 +16,10 @@ When User calls the "createProduct" "POST" http request
 Then API call has response status code "201"
 And "message" in the response body is "Product Added Successfully"
 And Response has "productId"
+
+
+
+
 
 
 

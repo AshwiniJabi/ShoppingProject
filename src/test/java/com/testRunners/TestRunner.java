@@ -9,7 +9,7 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
 		features = "src/test/java/com/features",
 		glue = {"com/stepdefinations"}
-		,tags = "@CreateProduct"
+		,tags = "@DeleteProduct"
 		
 		)
 public class TestRunner {

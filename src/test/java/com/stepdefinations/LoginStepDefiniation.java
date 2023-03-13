@@ -12,15 +12,18 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public class LoginStepDefiniation  {
 	RequestSpecification loginRequest = null;
-	LoginResponse loginResponseObj = null;
+	
 	public static Response response;
 	Response loginAPI = null;
-	
+	public static String userToken = null;
+	public static String userId = null;
+	String apiName = null;
 	
 	@Given("User has the payload for login {string} {string}")
 	public void user_has_the_payload_for_login(String userName, String password) {
@@ -35,6 +38,7 @@ public class LoginStepDefiniation  {
 	@When("User call the {string} {string} http request")
 	public void user_call_the_http_request(String methodName, String methodType) {
 	    // Write code here that turns the phrase above into concrete actions
+		apiName = methodName;
 		loginAPI = loginRequest.when().post("api/ecom/auth/login").then().log().all().extract().response();
 	   
 	}
@@ -44,6 +48,13 @@ public class LoginStepDefiniation  {
 	    String statusCode =  String.valueOf(loginAPI.getStatusCode());
 	    Assert.assertEquals(expectedStatusCode, statusCode);
 	    GlobalStepdefination.response = loginAPI;
+	    JsonPath loginJson = new JsonPath(loginAPI.asString());
+	    if(apiName.equalsIgnoreCase("LoginAPI") && (loginAPI.statusCode() == 200)) {
+	    	userToken =loginJson.getString("token");
+	    	userId = loginJson.getString("userId");
+	    	
+	    }
+	    
 	    
 	    
 	}

@@ -15,29 +15,31 @@ public class RequestBuilder {
 	public static RequestSpecBuilder buildRequest(RequestMembers requestMemberObj) {
 		
 		
-		String contentType = requestMemberObj.getContentType();
+		String contentType = null;
 		String baseurl = requestMemberObj.getBaseURL();
-		
+		if(!(requestMemberObj.getContentType() == null)) {
+			contentType = requestMemberObj.getContentType();
+		}
 		requestSpecObj = new RequestSpecBuilder().setBaseUri(baseurl);
 		if(!(requestMemberObj.getHeaderValues() == null)) {
 			requestSpecObj.addHeaders(requestMemberObj.getHeaderValues());
 		}
 	
 		if(!(requestMemberObj.getQueryParams()== null)) {
-			//build the query param
-			requestSpecObj.addQueryParams(requestMemberObj.getQueryParams());
+			
+				requestSpecObj.addQueryParams(requestMemberObj.getQueryParams());
 		}
 		if(!(requestMemberObj.getPathParams() == null)) {
-			//build the query param
+		
 			requestSpecObj.addPathParams(requestMemberObj.getPathParams());
 		}
-		
+		if(contentType != null) {
 		if(contentType.equalsIgnoreCase("multipart/form-data") && !(requestMemberObj.getMultiPartValues() == null)) {
 			//build multipart values
 			addMultiPart(requestMemberObj.getMultiPartValues());
 		}
 		
-		
+		}	
 		return requestSpecObj;
 	}
 	private static void addMultiPart(Map<String, String> multiPartValues) {
@@ -45,6 +47,8 @@ public class RequestBuilder {
 		 myMap = multiPartValues;
 		 String a = ".jpeg";
 		 for (Map.Entry<String,String> entry : myMap.entrySet()) {
+			 System.out.println(entry.getKey()+":"+entry.getValue());
+		
 			 if(entry.getValue().toLowerCase().contains(a.toLowerCase())) {
 				 requestSpecObj.addMultiPart(entry.getKey(), new File(entry.getValue()));
 			 }

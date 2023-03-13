@@ -17,11 +17,16 @@ import io.restassured.response.Response;
 public class ProductAPIStepDefinination{
 	
 	
-	public static RequestMembers requestMemberObj= new RequestMembers();
+	public RequestMembers requestMemberObj= new RequestMembers();
 	//public static String userId ="637890f3d7778f5797354828";
 	Response res= null;
-	LoginStepDefiniation login = new LoginStepDefiniation();
+	
 	Map<String,String> multiPartValues= new HashMap<String,String>();
+	Map<String,String> pathParamValues= new HashMap<String,String>();
+	String apiName = null;
+	public static String  productId= null;
+	
+	
 	@Given("User has valid usertoken")
 	public void user_has_valid_usertoken() {
 	    // Write code here that turns the phrase above into concrete actions
@@ -31,36 +36,50 @@ public class ProductAPIStepDefinination{
 		requestMemberObj.setHeaderValues(headerValues);
 		*/
 		
-		String username = "ashwini.spare@gmail.com";
-		String password ="arj14rsj";
 		
-		login.user_has_the_payload_for_login(username, password);
-		login.user_call_the_http_request("loginAPI", "POST");
-		Response loginResponse = login.loginAPI;
-		JsonPath loginJson= new JsonPath(loginResponse.asString());
-		if(loginResponse.statusCode() == 200) {
-			String userToken = loginJson.getString("token");
-			String userId = loginJson.getString("userId");
+	
+	
+		
+		
 			Map<String,String> headerValues= new HashMap<String,String>();
-			headerValues.put("Authorization", userToken);
+			headerValues.put("Authorization", LoginStepDefiniation.userToken);
 			requestMemberObj.setHeaderValues(headerValues);
-			user_gives_as("formParams", "productAddedBy", userId);
+			user_gives_as("formParams", "productAddedBy", LoginStepDefiniation.userId);
 			
+		
 		}
-	    
-	}
+	
 	@Given("User gives {string} {string} as {string}")
 	public void user_gives_as(String paramType, String key,String value) {
 	    // Write code here that turns the phrase above into concrete actions
 	   if(paramType.equalsIgnoreCase("formParams")) {
+		   
 		   multiPartValues.put(key, value);
+	   }
+	   else if(paramType.equalsIgnoreCase("pathParams")) {
+		   if(value.equalsIgnoreCase("value"))
+			   pathParamValues.put(key,productId);
+		   else
+			   pathParamValues.put(key,value);
+			   
 	   }
 	}
 	@When("User calls the {string} {string} http request")
 	public void user_calls_the_http_request(String methodName, String methodtype) {
+		if(methodName.equalsIgnoreCase("createProduct")) 
+		{
 		requestMemberObj.setMultiPartValues(multiPartValues);
+		requestMemberObj.setRequestMethod(methodtype);
 		res = ProductAPI.createProduct(requestMemberObj);
+		}
+		
+		if(methodName.equalsIgnoreCase("deleteProduct")) {
+			
+			requestMemberObj.setPathParams(pathParamValues);
+			res = ProductAPI.delete(requestMemberObj);
+		}
 		GlobalStepdefination.response = res;
+		apiName = methodName;
 	    // Write code here that turns the phrase above into concrete actions
 	   
 	}
@@ -68,9 +87,11 @@ public class ProductAPIStepDefinination{
 	public void response_has(String id) {
 	    // Write code here that turns the phrase above into concrete actions
 	    
-	    if(res.getStatusCode() ==201) {
-	    	JsonPath responseJson = new JsonPath(res.asString());
-	    	Assert.assertNotNull(responseJson.getString(id));
+	    if(apiName.equalsIgnoreCase("createProduct") && res.statusCode()==201) {
+	    	JsonPath createProductJson = new JsonPath(res.asString());
+	    	 productId = createProductJson.getString(id);
+	    	
+	    	Assert.assertNotNull(createProductJson.getString(id));
 	    }
 	}
 	
@@ -80,7 +101,7 @@ public class ProductAPIStepDefinination{
 	    // Write code here that turns the phrase above into concrete actions
 	    String statusCode =  String.valueOf(res.getStatusCode());
 	    Assert.assertEquals(expectedStatusCode, statusCode);
-	    JsonPath json = new JsonPath(res.asString());
+	    
 	    
 	    
 	}

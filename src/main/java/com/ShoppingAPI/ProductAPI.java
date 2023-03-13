@@ -21,4 +21,17 @@ public class ProductAPI {
 		Response res = createProduct.when().post(requestMemObj.getEndpoint()).then().log().all().extract().response();
 	return res;
 }
+ 
+ public static Response delete(RequestMembers requestMemObj ) {
+	 requestMemObj.setBaseURL("https://rahulshettyacademy.com/");
+	
+		
+		requestMemObj.setEndpoint("api/ecom/product/delete-product/{productId}");
+	 RequestSpecBuilder requestSpecObj = RequestBuilder.buildRequest(requestMemObj);
+		//RequestSpecification request= requestSpecObj.build();
+		RequestSpecification deleteProduct = given().spec(requestSpecObj.build()).log().all();
+		Response res = deleteProduct.when().delete(requestMemObj.getEndpoint()).then().log().all().extract().response();
+	return res;
+}
+ 
 }
